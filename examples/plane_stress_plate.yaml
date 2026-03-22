@@ -1,0 +1,92 @@
+problem:
+  name: "mixed_2d_plane_stress"
+  type: structural_static
+  dimension: 2
+  plane_condition: plane_stress
+
+materials:
+  - id: steel
+    type: linear_elastic
+    E: 200.0e9
+    nu: 0.3
+    rho: 7850.0
+    thickness: 0.01
+
+nodes:
+  # 3×2 node grid (x in [0,0.04], y in [0,0.04])
+  - id: 1
+    coords: [0.0,  0.0]
+  - id: 2
+    coords: [0.02, 0.0]
+  - id: 3
+    coords: [0.04, 0.0]
+  - id: 4
+    coords: [0.0,  0.02]
+  - id: 5
+    coords: [0.02, 0.02]
+  - id: 6
+    coords: [0.04, 0.02]
+  - id: 7
+    coords: [0.0,  0.04]
+  - id: 8
+    coords: [0.02, 0.04]
+  - id: 9
+    coords: [0.04, 0.04]
+
+elements:
+  # Bottom two elements: quad4
+  - id: 1
+    type: quad4
+    nodes: [1, 2, 5, 4]
+    material: steel
+  - id: 2
+    type: quad4
+    nodes: [2, 3, 6, 5]
+    material: steel
+  # Top two elements: tri3 (demonstrating mixed mesh)
+  - id: 3
+    type: tri3
+    nodes: [4, 5, 7]
+    material: steel
+  - id: 4
+    type: tri3
+    nodes: [5, 8, 7]
+    material: steel
+  - id: 5
+    type: tri3
+    nodes: [5, 6, 8]
+    material: steel
+  - id: 6
+    type: tri3
+    nodes: [6, 9, 8]
+    material: steel
+
+boundary_conditions:
+  essential:
+    - node: 1
+      dofs: [ux, uy]
+      values: [0.0, 0.0]
+    - node: 4
+      dofs: [ux, uy]
+      values: [0.0, 0.0]
+    - node: 7
+      dofs: [ux, uy]
+      values: [0.0, 0.0]
+  natural: []
+
+loads:
+  nodal:
+    - node: 9
+      dofs: [fy]
+      values: [-1000.0]
+  distributed: []
+
+solver:
+  type: direct
+  tolerance: 1.0e-10
+
+output:
+  nodal_displacements: true
+  element_stresses: true
+  reaction_forces: true
+  vtk: false

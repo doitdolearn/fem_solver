@@ -1,0 +1,62 @@
+problem:
+  name: "large_deflection_bar_nl"
+  type: nonlinear_static
+  dimension: 1
+
+# Demonstrates geometric nonlinearity (Total Lagrangian):
+#   E = A = L = 1 (normalised units)
+#   Applied load P = 0.9375
+#   Linear FEM gives u_tip = 0.9375  (wrong!)
+#   Nonlinear FEM gives u_tip = 0.5  (exact analytical solution)
+
+materials:
+  - id: nl_mat
+    type: linear_elastic
+    E: 1.0
+    nu: 0.0
+    rho: 0.0
+    A: 1.0
+
+nodes:
+  - id: 1
+    coords: [0.0]
+  - id: 2
+    coords: [0.5]
+  - id: 3
+    coords: [1.0]
+
+elements:
+  - id: 1
+    type: bar1d_nl
+    nodes: [1, 2]
+    material: nl_mat
+  - id: 2
+    type: bar1d_nl
+    nodes: [2, 3]
+    material: nl_mat
+
+boundary_conditions:
+  essential:
+    - node: 1
+      dofs: [ux]
+      values: [0.0]     # fixed left end
+  natural: []
+
+loads:
+  nodal:
+    - node: 3
+      dofs: [fx]
+      values: [0.9375]  # large axial force — linear FEM over-estimates by 87.5%
+  distributed: []
+
+solver:
+  type: newton_raphson
+  n_load_steps: 20      # proportional load stepping
+  max_iter: 50
+  tolerance: 1.0e-12
+
+output:
+  nodal_displacements: true
+  element_stresses: true   # outputs 2nd PK stress S = E·E_GL
+  reaction_forces: true
+  vtk: false

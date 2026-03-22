@@ -1,0 +1,54 @@
+problem:
+  name: "simple_1d_truss"
+  type: structural_static
+  dimension: 1
+
+materials:
+  - id: steel
+    type: linear_elastic
+    E: 200.0e9
+    nu: 0.3
+    rho: 7850.0
+    A: 0.01
+
+nodes:
+  - id: 1
+    coords: [0.0]
+  - id: 2
+    coords: [0.5]
+  - id: 3
+    coords: [1.0]
+
+elements:
+  - id: 1
+    type: bar1d
+    nodes: [1, 2]
+    material: steel
+  - id: 2
+    type: bar1d
+    nodes: [2, 3]
+    material: steel
+
+boundary_conditions:
+  essential:
+    - node: 1
+      dofs: [ux]
+      values: [0.0]
+  natural: []
+
+loads:
+  nodal:
+    - node: 3
+      dofs: [fx]
+      values: [1000.0]
+  distributed: []
+
+solver:
+  type: direct
+  tolerance: 1.0e-10
+
+output:
+  nodal_displacements: true
+  element_stresses: true
+  reaction_forces: true
+  vtk: false
