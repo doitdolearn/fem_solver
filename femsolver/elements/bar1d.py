@@ -8,7 +8,7 @@ from femsolver.utils.quadrature import gauss_1d
 class Bar1DElement(BaseElement):
     """2-node 1D bar element"""
 
-    def __init__(self, element_id, node_ids, nodes_coords, material):
+    def __init__(self, element_id, node_ids, nodes_coords, material, **kwargs):
         super().__init__(element_id, node_ids, nodes_coords, material)
         x1 = float(self.nodes_coords[0, 0])
         x2 = float(self.nodes_coords[1, 0])

@@ -9,15 +9,15 @@ materials:
   E: 130000000000.0
   nu: 0.28
   rho: 2330.0
-  alpha: 3.0e-06
+  alpha: 2.6e-06
 - id: film
   type: linear_elastic
-  E: 70000000000.0
-  nu: 0.33
+  E: 200000000000.0
+  nu: 0.3
   rho: 8000.0
-  alpha: 2.3e-05
+  alpha: 1.4e-05
 thermal_load:
-  delta_T: -30.0
+  delta_T: -375.0
 nodes:
 - id: 1
   coords:

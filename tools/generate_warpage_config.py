@@ -3,7 +3,7 @@
 
 Usage example:
     python tools/generate_warpage_config.py \
-        --h_f 1e-6 --h_s 500e-6 --R 50e-3 \
+        --h_f 1e-6 --h_s 500e-6 --R 1e-1 \
         --E_f 200e9 --E_s 130e9 --nu_f 0.3 --nu_s 0.28 \
         --alpha_f 14e-6 --alpha_s 2.6e-6 \
         --temp_init 400 --temp_final 25 \
@@ -12,7 +12,6 @@ Usage example:
 Formulations:
     (default)         3D cylindrical hex8_cyl (r, theta, z coords)
     --axisymmetric    2D axisymmetric quad4 (r, z coords) — fastest & most accurate
-    --cartesian-3d    3D Cartesian hex8 quarter-sector (x, y, z coords)
 """
 import argparse
 import sys
@@ -56,38 +55,21 @@ def main():
     p.add_argument("--n_z_film", type=int, default=None, help="Z divisions in film")
     # Formulation (mutually exclusive)
     form = p.add_mutually_exclusive_group()
-    form.add_argument("--axisymmetric", action="store_true",
+    form.add_argument("--axisymmetric", default=True, action="store_true",
                       help="2D axisymmetric quad4 (fastest, most accurate)")
-    form.add_argument("--cartesian-3d", action="store_true",
-                      help="3D Cartesian hex8 quarter-sector model")
     # Output
     p.add_argument("-o", "--output", required=True, help="Output YAML path")
 
     args = p.parse_args()
-    cartesian_3d = getattr(args, "cartesian_3d", False)
 
     delta_T = args.temp_final - args.temp_init
 
     # --- Set mesh defaults based on formulation ---
-    if args.axisymmetric:
-        n_r = args.n_r or 200
-        n_theta = 1  # unused
-        n_z_substrate = args.n_z_substrate or 40
-        n_z_film = args.n_z_film or 4
-        r_min = args.r_min if args.r_min is not None else args.R / 10000.0
-    elif cartesian_3d:
-        n_r = args.n_r or 40
-        n_theta = args.n_theta or 8
-        n_z_substrate = args.n_z_substrate or 20
-        n_z_film = args.n_z_film or 4
-        r_min = args.r_min if args.r_min is not None else args.R / 10000.0
-    else:
-        # Cylindrical hex8_cyl
-        n_r = args.n_r or 50
-        n_theta = args.n_theta or 16
-        n_z_substrate = args.n_z_substrate or 20
-        n_z_film = args.n_z_film or 2
-        r_min = args.r_min if args.r_min is not None else args.R / 1000.0
+    n_r = args.n_r or 200
+    n_theta = 1  # unused
+    n_z_substrate = args.n_z_substrate or 40
+    n_z_film = args.n_z_film or 4
+    r_min = args.r_min if args.r_min is not None else args.R / 10000.0
 
     # --- Generate mesh ---
     # if args.axisymmetric:
@@ -144,7 +126,7 @@ def main():
 
     n_nodes = len(mesh_data["nodes"])
     n_elems = len(mesh_data["elements"])
-    mode = "axisymmetric" if args.axisymmetric else ("cartesian-3D" if cartesian_3d else "cylindrical-3D")
+    mode = "axisymmetric"
     print(f"Generated {args.output}: {n_nodes} nodes, {n_elems} elements, "
           f"delta_T={delta_T}, mode={mode}")
 
