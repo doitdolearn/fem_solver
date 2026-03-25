@@ -2,7 +2,7 @@
 
 간단한 FEM(유한요소법) Solver를 파이썬으로 구현한 프로젝트입니다.
 
-![Warpage 해석 결과](assets/warpage_result.png)
+<img src="assets/warpage_result.png" width="500" />
 
 ## 구현된 요소
 
